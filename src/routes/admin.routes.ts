@@ -1,13 +1,27 @@
 import { Router } from "express";
-import { addToken, deleteToken, getToken, spesificToken } from "../controllers/token.controller";
+import { addToken, nonactiveToken, getToken, spesificToken } from "../controllers/token.controller";
+import { authMiddleware } from "../middlewares/auth.middleware";
+import { getAllPeserta, getDetailPeserta } from "../controllers/peserta.controller";
+import { getDashboard } from "../controllers/dashboard.controller";
 
 
 const router = Router()
 
 //  Token
 router.get('/token', getToken)
+router.get('/token/form', (req, res)=> {})
 router.post('/token', addToken)
 router.get('/token/:id', spesificToken)
-router.delete('/token/:id', deleteToken)
+router.put('/token/:id', nonactiveToken)
+
+//peserta
+router.get('/peserta', getAllPeserta)
+router.get('/peserta/detail/:id', getDetailPeserta)
+
+//dashboard
+router.get('/dashboard', (req, res)=>{})
+
+//hasil tes
+router.get('/hasiltes', authMiddleware)
 
 export default router

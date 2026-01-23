@@ -1,4 +1,4 @@
-import { fetchToken, postToken, tokenDelete } from "../services/token.service"
+import { fetchToken, postToken, tokenNonactive } from "../services/token.service"
 
 
 export const getToken = async (req:any, res:any) => {
@@ -23,9 +23,11 @@ export const spesificToken = async (req:any, res:any) => {
     return console.log(id)
 }
 
-export const deleteToken = async (req:any, res:any) => {
+export const nonactiveToken = async (req:any, res:any) => {
     const id = Number(req.params.id)
-    const token = await tokenDelete(id, res)
+    const statusActive = req.body
+    console.log('ini contriller:', statusActive)
+    const token = await tokenNonactive(id, res, statusActive)
     const status = token.success? 200 : 404
 
     return res.status(status).json({

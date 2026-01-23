@@ -107,6 +107,7 @@ model TestSession {
   id         Int       @id @default(autoincrement())
   pesertaId Int
   token     String
+  statusTest Int 
 
   startedAt DateTime  @default(now())
   finishedAt DateTime?

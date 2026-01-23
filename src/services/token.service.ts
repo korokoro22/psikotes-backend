@@ -1,4 +1,4 @@
-import { deleteToken, tokenList, tokenPost } from "../models/token.model"
+import { nonactiveToken, tokenList, tokenPost } from "../models/token.model"
 
 export const fetchToken = async () => {
     const dataToken = await tokenList()
@@ -20,8 +20,8 @@ export const postToken = async (postToken:any, res:any) => {
     const dataToken = await tokenPost(postToken, res)
 }
 
-export const tokenDelete = async (id:any, res:any) => {
-    const deleteMessage = await deleteToken(id, res)
-
+export const tokenNonactive = async (id:any, res:any, statusActive:boolean) => {
+    console.log('ini service:', statusActive)
+    const deleteMessage = await nonactiveToken(id, res, statusActive)
     return deleteMessage
 }

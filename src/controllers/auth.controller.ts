@@ -19,13 +19,17 @@ export const login = async (req:any, res:any) =>{
 }
 
 export const logout = async (req:any, res:any) => {
+        console.log('hai')
         res.clearCookie('access_token', {
+                    // path: '/',
                     httpOnly: true,
-                    secure: process.env.ACCESS_TOKEN_SECRET,
-                    maxAge: 2 * 60 * 1000, //15 menit
+                    secure: process.env.NODE_ENV === 'production',
+                    // maxAge: 2 * 60 * 1000, //15 menit
                     sameSite: 'strict'
                 })
     return (
-        res.redirect('http://localhost:4000/api/admin/login')
+        res.status(200).json({
+            message: 'Berhasil logout'
+        })
     )
 }

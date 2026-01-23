@@ -3,26 +3,23 @@ import jwt from "jsonwebtoken"
 
 export const authMiddleware = (req: any, res: any, next:NextFunction) => {
     
-    const cookie = req.headers.cookie
-
+    const cookie = req.cookies.access_token
+    console.log(cookie)
     if(!cookie) {
-        return res.status(403).json({
+        return res.status(401).json({
             message: 'Unauthorized. No token provided.'
         })    
     }
 
     try {
-        const splittedCookie:string = cookie.split(/(=)/)[2]??""
-        const decoded = jwt.verify(splittedCookie, process.env.ACCESS_TOKEN_SECRET!)
+        const decoded = jwt.verify(cookie, process.env.ACCESS_TOKEN_SECRET!)
         req.user = decoded
+        // console.log(req.user)
         next()
 
     } catch (err) {
-        return (
-        //     res.status(403).json({
-        //     message: 'Invalid token'
-        // })
-        res.redirect(301, 'http://localhost:4000/api/admin/login')
-        )
+        return res.status(401).json({
+            message: 'Unauthorized. Invalid or expired token.'
+        })
     }
 }

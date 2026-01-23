@@ -8,6 +8,12 @@ export const checkLogin= async (dataLogin: any, res:any) => {
     const InputUsername = dataLogin.username
     const dataAdmin = await getUsername(InputUsername)
 
+    if(!dataAdmin) {
+        return {
+            success: false,
+            message: 'Username/Password Salah'
+        }
+    }
     if(dataAdmin != null) {
         const hashedPassword = dataAdmin.password
         // bcrypt.compare(InputPassword, hashedPassword)
@@ -21,14 +27,14 @@ export const checkLogin= async (dataLogin: any, res:any) => {
                 const secret = process.env.ACCESS_TOKEN_SECRET!
                 const token = jwt.sign(
                     payload, secret, {      
-                        expiresIn: '2m'
+                        expiresIn: '15m'
                     }
                 )
 
                 res.cookie('access_token', token, {
                     httpOnly: true,
-                    secure: process.env.ACCESS_TOKEN_SECRET,
-                    maxAge: 2 * 60 * 1000, //15 menit
+                    secure: process.env.NODE_ENV === 'production',
+                    maxAge: 15 * 60 * 1000, //15 menit
                     sameSite: 'strict'
                 })
 
