@@ -16,7 +16,6 @@ datasource db {
   
 }
 
-
 enum JenisKelamin {
   LAKI_LAKI
   PEREMPUAN
@@ -31,6 +30,16 @@ enum Tests {
   PAPIKOSTICK
 }
 
+enum Unit {
+  SMP // Samamaju Prima
+  MPP // makassar putra prima
+  MMPP // makassar megaputra prima
+  IMP //Indo mega prima
+  PPH //putra prima hotel
+  ACS // Aptana Citra Solusindo
+  UNKNOWN
+}
+
 // Peserta
 
 model Peserta {
@@ -40,6 +49,7 @@ model Peserta {
   usia Int
   pendidikanTerakhir String
   jurusan String
+  unit Unit @default(UNKNOWN)
 
   testSession TestSession[]
 
@@ -53,32 +63,54 @@ model Peserta {
 // Questions
 
 model CfitQuestion {
-  id              Int      @id @default(autoincrement())
-  questionImages  String[]
-  answerImages    String[]
-  correctAnswer   Int
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  subtest   Int
+  order     Int
+  imagePath String        // gambar soal utama
+  isPractice Boolean @default(false)
+
+  options   CfitOption[]
+
+  createdAt DateTime @default(now())  
+  updatedAt DateTime @updatedAt
+
+  @@unique([subtest, order, isPractice])
 }
 
+model CfitOption {
+  id          Int      @id @default(autoincrement())
+  questionId  Int
+  label       String    // A, B, C, D, E, F
+  imagePath   String    // satu gambar saja
+
+  question    CfitQuestion @relation(fields: [questionId], references: [id])
+
+  @@index([questionId])
+}
+
+
+// Questions-MSDT
 model MsdtQuestion {
   id        Int      @id @default(autoincrement())
   sentences Json
   createdAt DateTime @default(now())
 }
 
+// Questions-DISC
 model DiscQuestion {
   id        Int      @id @default(autoincrement())
   words     Json
   createdAt DateTime @default(now())
 }
 
+// Questions-MBTI
 model MbtiQuestion {
   id        Int       @id @default(autoincrement())
   sentences Json
   createdAt DateTime  @default(now())  
 }
 
+// Questions-PAPIKOSTICK
 model PapikostickQuestion {
   id        Int       @id @default(autoincrement())
   sentences Json
@@ -114,6 +146,9 @@ model TestSession {
 
   peserta   Peserta   @relation(fields: [pesertaId], references: [id])
   attempts  TestAttempt[]
+
+  jawabanCfit JawabanCfit[] 
+  jawabanDisc JawabanDisc[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -154,4 +189,26 @@ model Admin {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model JawabanCfit {
+  id         Int @id @default(autoincrement())
+  sessionId  Int
+  subtest    Int 
+  questionId Int
+  answers    String[]        
+
+  session    TestSession @relation(fields: [sessionId], references: [id])
+  createdAt  DateTime @default(now())
+}
+
+model JawabanDisc {
+  id          Int @id @default(autoincrement())
+  sessionId   Int
+  questionId  Int
+  most        String
+  least       String
+
+  session     TestSession @relation(fields: [sessionId], references: [id])
+  createdAt   DateTime @default(now())
 }

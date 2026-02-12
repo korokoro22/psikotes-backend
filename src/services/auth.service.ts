@@ -3,7 +3,7 @@ import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import cookieParser from "cookie-parser"
 
-export const checkLogin= async (dataLogin: any, res:any) => {
+export const loginService= async (dataLogin: any, res:any) => {
     const InputPassword = dataLogin.password
     const InputUsername = dataLogin.username
     const dataAdmin = await getUsername(InputUsername)

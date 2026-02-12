@@ -1,27 +1,63 @@
-import { nonactiveToken, tokenList, tokenPost } from "../models/token.model"
-
-export const fetchToken = async () => {
-    const dataToken = await tokenList()
-    if (!dataToken) {
+// import { nonactiveToken, tokenList, tokenPost } from "../models/token.model"
+import { tokenNonactiveModel, fetchTokenModel, postTokenModel } from "../models/token.model"
+export const getTokenService = async () => {
+    try {
+        const dataToken = await fetchTokenModel()
         return ({
-            success: false,
-            message: 'Data tidak ditemukan.'
+            status: true,
+            message: 'berhasil mendapatkan token',
+            data: dataToken
+        })
+    } catch (error) {
+        return ({
+            status: false,
+            message: 'gagal mendapatkan token'
         })
     }
-    return ({
-        success: true,
-        message: 'Data ditemukan',
-        data: dataToken
-    })
+    // if (!dataToken) {
+    //     return ({
+    //         success: false,
+    //         message: 'Data tidak ditemukan.'
+    //     })
+    // }
+    // return ({
+    //     success: true,
+    //     message: 'Data ditemukan',
+    //     data: dataToken
+    // })
 }
 
-export const postToken = async (postToken:any, res:any) => {
-    // console.log('ini di service: ', postToken)
-    const dataToken = await tokenPost(postToken, res)
+export const addTokenService = async (postToken:any, res:any) => {
+    // console.log('ini di Model: ', postToken)
+    try{
+        const dataToken = await postTokenModel(postToken, res)
+        return ({
+            status: true,
+            message: 'berhasil menambahkan token',
+            data: dataToken
+        })
+    } catch(error) {
+        return({
+            status: false,
+            message: 'gagal menambahkan token',
+        })
+    }
 }
 
-export const tokenNonactive = async (id:any, res:any, statusActive:boolean) => {
+export const nonactiveTokenService = async (id:any, res:any, statusActive:boolean) => {
     console.log('ini service:', statusActive)
-    const deleteMessage = await nonactiveToken(id, res, statusActive)
-    return deleteMessage
+    
+    try{
+        const deleteMessage = await tokenNonactiveModel(id, res, statusActive)
+        return({
+            status: true,
+            message: 'token berhasi dinonaktifkan',
+            data: deleteMessage
+        })
+    } catch(error) {
+        return ({
+            status: false,
+            message: 'token gagal dinonaktifkan'
+        })
+    }
 }

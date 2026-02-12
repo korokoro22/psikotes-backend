@@ -1,0 +1,155 @@
+import { PrismaClient } from "@prisma/client"
+
+const prisma = new PrismaClient
+
+export const getCfit1QuestionsContohModel = async (req:any, res:any) => {
+    return await prisma.cfitQuestion.findMany({
+        where: {
+            isPractice: true,
+            subtest: 1
+        },
+        select: {
+            imagePath: true,
+            options: {
+                select: {
+                    questionId: true,
+                    label: true,
+                    imagePath: true,
+                }
+            },
+        }
+    })
+}
+
+export const getCfit1QuestionsSoalModel = async (req:any, res:any) => {
+    return await prisma.cfitQuestion.findMany({
+        where: {
+            isPractice: false,
+            subtest: 1
+        },
+        select: {
+            imagePath: true,
+            options: {
+                select: {
+                    questionId: true,
+                    label: true,
+                    imagePath: true,
+                }
+            },
+        }
+    })
+}
+
+export const getCfit2QuestionsContohModel = async (req:any, res:any) => {
+    return await prisma.cfitQuestion.findMany({
+        where: {
+            isPractice: true,
+            subtest: 2
+        },
+        select: {
+            imagePath: true,
+            options: {
+                select: {
+                    questionId: true,
+                    label: true,
+                    imagePath: true,
+                }
+            },
+        }
+    })
+}
+
+export const getCfit2QuestionsSoalModel = async (req:any, res:any) => {
+    return await prisma.cfitQuestion.findMany({
+        where: {
+            isPractice: false,
+            subtest: 2
+        },
+        select: {
+            imagePath: true,
+            options: {
+                select: {
+                    questionId: true,
+                    label: true,
+                    imagePath: true,
+                }
+            },
+        }
+    })
+}
+
+export const getCfit3QuestionsContohModel = async (req:any, res:any) => {
+    return await prisma.cfitQuestion.findMany({
+        where: {
+            isPractice: true,
+            subtest: 3
+        },
+        select: {
+            imagePath: true,
+            options: {
+                select: {
+                    questionId: true,
+                    label: true,
+                    imagePath: true,
+                }
+            },
+        }
+    })
+}
+
+export const getCfit3QuestionsSoalModel = async (req:any, res:any) => {
+    return await prisma.cfitQuestion.findMany({
+        where: {
+            isPractice: false,
+            subtest: 3
+        },
+        select: {
+            imagePath: true,
+            options: {
+                select: {
+                    questionId: true,
+                    label: true,
+                    imagePath: true,
+                }
+            },
+        }
+    })
+}
+
+export const getCfit4QuestionsContohModel = async (req:any, res:any) => {
+    return await prisma.cfitQuestion.findMany({
+        where: {
+            isPractice: true,
+            subtest: 4
+        },
+        select: {
+            imagePath: true,
+            options: {
+                select: {
+                    questionId: true,
+                    label: true,
+                    imagePath: true,
+                }
+            },
+        }
+    })
+}
+
+export const getCfit4QuestionsSoalModel = async (req:any, res:any) => {
+    return await prisma.cfitQuestion.findMany({
+        where: {
+            isPractice: false,
+            subtest: 4
+        },
+        select: {
+            imagePath: true,
+            options: {
+                select: {
+                    questionId: true,
+                    label: true,
+                    imagePath: true,
+                }
+            },
+        }
+    })
+}

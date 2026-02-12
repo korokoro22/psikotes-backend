@@ -1,9 +1,8 @@
-import { successResponse } from "../utils/tests.utils";
-import { checkLogin } from "../services/auth.service";
+import { loginService } from "../services/auth.service";
 import cookieParser from "cookie-parser"
 
 export const login = async (req:any, res:any) =>{
-    const getLogin = await checkLogin(req.body, res)
+    const getLogin = await loginService(req.body, res)
     
     if (getLogin == undefined) {
         return

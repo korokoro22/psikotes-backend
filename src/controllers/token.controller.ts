@@ -1,25 +1,29 @@
-import { fetchToken, postToken, tokenNonactive } from "../services/token.service"
+// import { fetchToken, postToken, tokenNonactive } from "../services/token.service"
+import { getTokenService, addTokenService, nonactiveTokenService } from "../services/token.service"
 
 
 export const getToken = async (req:any, res:any) => {
-    const tokenList = await fetchToken()
-    
-    const status = tokenList.success? 200 : 204
-    return res.status(status).json({
-        message: tokenList.message,
-        data: tokenList.data
-    })
+    const tokenList = await getTokenService()
+
+    if(!tokenList.status) {
+        return res.status(400).json(tokenList)
+    }
+
+    return res.status(201).json(tokenList)
 }
 
 export const addToken = async (req:any, res:any) => {
-    const token = await postToken(req.body, res)
-    // console.log(req.body)
-    // const token = await postToken()
+    const token = await addTokenService(req.body, res)
+
+    if(!token.status) {
+        return res.status(400).json(token)
+    }
+
+    return res.status(201).json(token)
 }
 
 export const spesificToken = async (req:any, res:any) => {
-    const id = req.params.id
-
+    const id = req.params.id // ???
     return console.log(id)
 }
 
@@ -27,11 +31,11 @@ export const nonactiveToken = async (req:any, res:any) => {
     const id = Number(req.params.id)
     const statusActive = req.body
     console.log('ini contriller:', statusActive)
-    const token = await tokenNonactive(id, res, statusActive)
-    const status = token.success? 200 : 404
+    const token = await nonactiveTokenService(id, res, statusActive)
+    
+    if (!token.status) {
+        return res.status(400).json(token)
+    } 
 
-    return res.status(status).json({
-        message: token.message,
-        data: token.data
-    })
+    return res.status(201).json(token)
 }

@@ -5,6 +5,7 @@ import { getAllPeserta, getDetailPeserta } from "../controllers/peserta.controll
 import { getDashboard } from "../controllers/dashboard.controller";
 
 
+
 const router = Router()
 
 //  Token
@@ -23,5 +24,6 @@ router.get('/dashboard', (req, res)=>{})
 
 //hasil tes
 router.get('/hasiltes', authMiddleware)
+
 
 export default router

@@ -2,11 +2,12 @@ import { PrismaClient } from "@prisma/client"
 
 const prisma = new PrismaClient
 
-export const postPeserta = async (post:any, res:any, id:any) => {
-    const pesertaPost = await prisma.peserta.create({
+export const postPesertaModel = async (post:any, res:any, id:any) => {
+    return await prisma.peserta.create({
         data: {
             nama: post.nama,
             jenisKelamin: post.jenisKelamin,
+            unit: post.unit,
             usia: post.usia,
             pendidikanTerakhir: post.pendidikanTerakhir,
             jurusan: post.jurusan,
@@ -28,15 +29,10 @@ export const postPeserta = async (post:any, res:any, id:any) => {
             token: true
         }
     })
-
-     
-
-    return pesertaPost
 }
 
-export const getPeserta = async () => {
-    try{
-        const peserta = await prisma.peserta.findMany({
+export const getAllPesertaModel = async () => {
+    return await prisma.peserta.findMany({
         select: {
             nama: true,
             id: true,
@@ -51,43 +47,36 @@ export const getPeserta = async () => {
             }
         }
     })
-    return peserta
-    } catch (err) {
-        return {
-            message: err
-        }
-    }
-    
-
-    // return peserta
 }
 
-export const getDetail = async (id:number, res:any) => {
-    try{
-        const peserta = await prisma.peserta.findUnique({
-            where: {
-                id: id
-            },
-            select: {
-                nama: true,
-                jenisKelamin: true,
-                usia: true,
-                pendidikanTerakhir: true,
-                jurusan: true,
+export const getDetailPesertaModel = async (id:number, res:any) => {
+    return await prisma.peserta.findUnique({
+        where: {
+            id: id
+        },
+        select: {
+            nama: true,
+            jenisKelamin: true,
+            usia: true,
+            pendidikanTerakhir: true,
+            jurusan: true,
 
-                testSession: {
-                select: {
-                    statusTest: true
+            testSession: {
+            select: {
+                statusTest: true
                 }
             }
-            },
-            
-        })
+        },            
+    })
+}
 
-    return peserta
-    } catch (err) {
-        return {
-            message: err
+export const statusPesertaModel = async (sessionId: number, res:any) => {
+    return await prisma.testSession.update({
+        where: {
+            id: sessionId
+        },
+        data: {
+           statusTest: {increment: 1} 
         }
-    }
+    })
 }

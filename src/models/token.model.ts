@@ -4,22 +4,22 @@ import { generateTestToken } from "../utils/token.utils";
 const prisma = new PrismaClient
 
 //read token (semua)
-export const tokenList = async () => {
-    const listToken = await prisma.token.findMany({
+export const fetchTokenModel = async () => {
+    return await prisma.token.findMany({
         select: {
             id:true,
             token: true,
             tests: true,
             kuota: true,
+            usedCount: true,
             isActive: true
         }
     })
-    return listToken
 }
 
 //read token (spesifik (token) )
 export const getSpecificToken = async (tokenInput:string) => {
-        const getToken = await prisma.token.findUnique({
+        return await prisma.token.findUnique({
             where: {
                 token: tokenInput
             },
@@ -32,27 +32,21 @@ export const getSpecificToken = async (tokenInput:string) => {
                 isActive: true
             }
         })
-        return getToken
 }
 
 //tambah token
-export const tokenPost = async (postToken:any, res:any) => {
-    const newToken = await prisma.token.create({
+export const postTokenModel = async (postToken:any, res:any) => {
+    return await prisma.token.create({
         data: {
             token: generateTestToken(5),
             tests: postToken.tests,
             kuota: postToken.kuota
         }
     })
-
-    return res.status(200).json({
-        message: 'data berhasil ditambahkan'
-    })
 }
 
-export const nonactiveToken = async (id:number, res:any, statusActive:any) => {
-    try {
-        const tokenDelete = await prisma.token.update({
+export const    tokenNonactiveModel = async (id:number, res:any, statusActive:any) => {
+        return await prisma.token.update({
             where: {
                 id: id
             },
@@ -60,19 +54,6 @@ export const nonactiveToken = async (id:number, res:any, statusActive:any) => {
                 isActive: statusActive.status
             }
         })
-
-        return ({
-            success: true,
-            message: 'Berhasil dihapus.',
-            data: tokenDelete
-        })
-    } catch(error) {
-        console.log(error)
-        return ({
-            success: false,
-            message: error
-        })
-    }
 }
 
 export const addCount = async (id: any) => {
