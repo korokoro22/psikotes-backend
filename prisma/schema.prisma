@@ -45,10 +45,12 @@ enum Unit {
 model Peserta {
   id Int @id @default(autoincrement())
   nama String
+  email String @default("null")
   jenisKelamin JenisKelamin
   usia Int
   pendidikanTerakhir String
-  jurusan String
+  jurusan String 
+  posisi String @default("null")
   unit Unit @default(UNKNOWN)
 
   testSession TestSession[]

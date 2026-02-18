@@ -7,7 +7,6 @@ export const answersCfit = async (req:any, res:any) => {
     if(!answers.status) {
         return res.status(400).json(answers)
     }
-
     return res.status(201).json(answers)
 }
 

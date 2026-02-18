@@ -1,0 +1,135 @@
+import { n8nCfitModel } from "../models/n8n.model"
+
+export const n8nCfitService = async (req:any, res:any, id: number) => {
+    try {
+        const pesertaId = id
+        const n8n = await n8nCfitModel(pesertaId)
+        console.log(n8n)
+        if( n8n === null) {
+            return ({
+                status: false,
+                message: 'data kosong'
+            })
+        }
+
+        let unit:string = n8n.unit
+        let unitTrue = ''
+
+        switch(unit) {
+          case 'MPP':
+            unitTrue = 'PT. Makassar Putra Prima'
+            break
+            
+          case 'ACS':
+            unitTrue = 'PT. Aptana Citra Solusindo'
+            break
+            
+          case 'MMPP':
+            unitTrue = 'PT. Makassar Megaputra Prima'
+            break
+
+          case 'IMP':
+            unitTrue = 'PT. Indo Mega Prima'
+            break
+          
+          case 'PPH':
+            unitTrue = 'PT. Putra Prima Hotel'
+            break
+          
+          case 'SMP':
+            unitTrue = 'PT. Samamaju Prima'
+            break
+        }
+
+        
+        let jenisKelamin:string = n8n.jenisKelamin
+        let gender = ''
+        
+        switch(jenisKelamin) {
+          case 'LAKI_LAKI':
+            gender = 'Laki-laki'
+            break
+          
+          case 'PEREMPUAN':
+            gender = 'Perempuan'
+            break
+        }
+
+        const peserta:any = {
+            "nama": n8n.nama,
+            "email": n8n.email,
+            "usia": n8n.usia,
+            "jenis kelamin": gender,
+            "pendidikan terakhir": n8n.pendidikanTerakhir,
+            "bisnis unit": unitTrue,
+            "jurusan": n8n.jurusan,
+            "posisi yang dilamar": n8n.posisi
+        }
+
+        n8n.testSession.forEach(session => {
+            session.jawabanCfit.forEach(jawaban => {
+                const key = `S${jawaban.subtest}_Q${jawaban.questionId}`
+                peserta[`${key}`] = jawaban.answers.join(",")
+            })
+        })
+
+        return ({
+            status: true,
+            message: 'berhasil mendapatkan data jawaban peserta',
+            data: peserta
+        })
+    } catch (error) {
+        return ({
+            status: false,
+            message: 'Gagal mendapatkan data jawaban peserta'
+        })
+    }
+}
+
+
+export const triggerN8NService = async (pesertaId: number) => {
+    const N8N_WEBHOOK_URL_PRODUCTION = process.env.N8N_WEBHOOK_URL_PRODUCTION;
+
+    if (!N8N_WEBHOOK_URL_PRODUCTION) {
+        console.warn('⚠️ N8N_WEBHOOK_URL_PRODUCTION not configured');
+        return {
+            status: false,
+            message: 'N8N webhook URL not configured'
+        };
+    }
+
+    try {
+        console.log(`🔔 Triggering N8N for peserta ${pesertaId}...`);
+
+        const response = await fetch(N8N_WEBHOOK_URL_PRODUCTION, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                pesertaId: pesertaId,
+                timestamp: new Date().toISOString(),
+                event: 'test_completed'
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`N8N responded with status ${response.status}`);
+        }
+
+        console.log(`✅ N8N triggered successfully for peserta ${pesertaId}`);
+
+        return {
+            status: true,
+            message: 'N8N triggered successfully'
+        };
+
+    } catch (error) {
+        console.error(`❌ Failed to trigger N8N for peserta ${pesertaId}:`, error);
+
+        return {
+            status: false,
+            message: 'Failed to trigger N8N'
+        };
+    }
+};

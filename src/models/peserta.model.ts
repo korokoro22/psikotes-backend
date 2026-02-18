@@ -6,11 +6,13 @@ export const postPesertaModel = async (post:any, res:any, id:any) => {
     return await prisma.peserta.create({
         data: {
             nama: post.nama,
+            email: post.email,
             jenisKelamin: post.jenisKelamin,
             unit: post.unit,
             usia: post.usia,
             pendidikanTerakhir: post.pendidikanTerakhir,
             jurusan: post.jurusan,
+            posisi: post.posisi,
             tokenId: id,
             
             testSession: {
@@ -21,8 +23,6 @@ export const postPesertaModel = async (post:any, res:any, id:any) => {
                 }
                 ]
             }
-
-
         },
         include: {
             testSession: true,
