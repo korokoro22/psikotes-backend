@@ -32,3 +32,44 @@ export const n8nCfitModel = async (id:number) => {
         }
     })
 }
+
+export const n8nKraepelinModel = async (id:number) => {
+    return prisma.peserta.findUnique({
+        where: {
+            id: Number(id)
+        },
+        select: {
+            nama: true,
+            email:true,
+            jenisKelamin: true,
+            usia: true,
+            pendidikanTerakhir: true,
+            unit: true,
+            posisi:true,
+            jurusan: true,
+            testSession: {
+                select: {
+                    jawabanKraepelin: {
+                        select: {
+                            columnIndex: true,
+                            answers: true,
+                            correctAnswers: true,
+                            wrongAnswers: true,
+                            totalAnswered: true
+                        }
+                    },
+                    kraepelinLog: {
+                        select: {
+                            timestamp: true,
+                            event: true,
+                            fromCol: true,
+                            toCol: true,
+                            fromPair: true,
+                            toPair: true
+                        }
+                    }
+                }
+            }
+        }
+    })
+}

@@ -1,7 +1,11 @@
 import { Router } from "express";
 import { addToken, nonactiveToken, getToken, spesificToken } from "../controllers/token.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
-import { getAllPeserta, getDetailPeserta } from "../controllers/peserta.controller";
+import { 
+    getAllPeserta, 
+    getDetailPeserta,
+    hasilPesertaController
+} from "../controllers/peserta.controller";
 import { getDashboard } from "../controllers/dashboard.controller";
 
 
@@ -23,7 +27,7 @@ router.get('/peserta/detail/:id', getDetailPeserta)
 router.get('/dashboard', (req, res)=>{})
 
 //hasil tes
-router.get('/hasiltes', authMiddleware)
+router.get('/hasiltes', hasilPesertaController)
 
 
 export default router

@@ -1,4 +1,10 @@
-import { answersCfitModel, answersDiscModel } from "../models/answers.model"
+import { 
+    answersCfitModel, 
+    answersDiscModel,
+    answersKraepelinModel,
+    answersKraepelinLogModel,
+    n8nAnswersKraepelinModel
+ } from "../models/answers.model"
 
 type DiscAnswerInput = {
     groupId: number
@@ -10,6 +16,19 @@ type DiscAnswerPayload = {
     most: string
     least: string
 }
+
+type n8nKraepelinAnswers = {
+    id: number
+}
+
+// type logPayload = {
+//     timestamp: Date
+//     event: string
+//     fromCol: number
+//     toCol: number
+//     fromPair: number
+//     toPair: number
+// }
 
 export const answersCfitService = async (data:any, res:any, sessionId:number) => {
     try{
@@ -64,6 +83,70 @@ export const answersDiscService = async (data:any, sessionId: number, res:any) =
             message: error
         })
     }
+}
 
+export const answersKraepelinService = async (data: any, sessionId: number, res:any) => {
+    
+    try {
+        const kraepelinAnswers = data.columnResults
+        const log = data.auditLog
+        const answers = await answersKraepelinModel(kraepelinAnswers, sessionId)
+        const answersLog = await answersKraepelinLogModel(log, sessionId)
+        
+        return {
+            status: true,
+            message: 'jawaban berhasil dikirim',
+            dataAnswers: answers,
+            dataLog: answersLog
+        }
+    } catch (error) {
+        return {
+            status: false,
+            message: error
+        }
+    }
 
+    // const answers = data.columnResults
+    // const summary = data.summary
+    // const log:logPayload[] = data.auditLog
+    // const newLog = {
+    //     data: log.map(item => ({
+    //         ...item,
+    //     })),
+    //     completedAt: data.completedAt
+    // }
+    // console.log(newLog)
+
+    // console.log(answers, summary, log)
+    // console.log(data.columnResults[0].answers)
+}
+
+export const n8nAnswersKraepelinService = async (data:any) => {
+    try {
+        const kraepelin = await n8nAnswersKraepelinModel(data)
+        const dataKraepelin: n8nKraepelinAnswers[] = data 
+
+        if(kraepelin.count !== data.length) {
+            return {
+                status: false,
+                message: 'Gagal'
+            }
+        }
+        return {
+            status: true,
+            message: 'Berhasil',
+            data: {
+                status: 'success',
+                id: dataKraepelin.map(item => ({
+                    id: item.id
+                }))
+            }
+        }
+    } catch(error) {
+        return {
+            status: false,
+            message: 'gagal1'
+        }
+    }
+    
 }

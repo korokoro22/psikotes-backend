@@ -1,5 +1,16 @@
-import { postPesertaModel, getAllPesertaModel , getDetailPesertaModel, statusPesertaModel} from "../models/peserta.model"
-import { addCount, getSpecificToken } from "../models/token.model"
+import { 
+    postPesertaModel, 
+    getAllPesertaModel , 
+    getDetailPesertaModel, 
+    statusPesertaModel,
+    hasilPesertaModel
+} from "../models/peserta.model"
+import { 
+    addCount, 
+    getSpecificToken,
+     
+} from "../models/token.model"
+
 export const postPesertaService = async (post:any, res:any) => {
     const postToken = post.tokenPeserta
     const token = await getSpecificToken(postToken)
@@ -111,4 +122,51 @@ export const statusPesertaService = async (sessionId:number, res:any) => {
         })
 
     }
+}
+
+// Hasil Tes
+export const hasilPesertaService = async () => {
+    try {
+        const peserta = await hasilPesertaModel()
+        const date = peserta[0]?.peserta.createdAt
+        console.log(date)
+
+        if(date == undefined) {
+            return {
+                status: false,
+                message: "gagal mendapatkan data"
+            }
+        }
+        
+        const dateParser = new Date(date);
+        const witaFormatter = new Intl.DateTimeFormat('id-ID', {
+        timeZone: 'Asia/Makassar',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+        });
+        
+        const time = witaFormatter.format(dateParser).split(", ")
+        const dateTest = time[0]+':'+time[1]+' WITA'
+
+        const newPeserta = {
+            name: peserta[0]?.peserta.nama,
+            date : dateTest
+        }
+
+        return ({
+            status: true,
+            message: "berhasil mendapatkan data",
+            data: newPeserta
+        })
+    } catch (error) {
+        return ({
+            status: false,
+            message: "gagal mendapatkan data"
+        })
+    }
+    
 }

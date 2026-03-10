@@ -1,6 +1,12 @@
 import { Router } from "express";
 import { postPeserta, statusPeserta} from "../controllers/peserta.controller";
-import { answersCfit, answersDisc} from "../controllers/answers.controller"
+import { 
+    answersCfit, 
+    answersDisc, 
+    answersKraepelin,
+    n8nAnswersKraepelin
+} from "../controllers/answers.controller"
+
 import {
     getCfit1QuestionsContoh, 
     getCfit1QuestionsSoal,
@@ -9,7 +15,7 @@ import {
     getCfit3QuestionsContoh,
     getCfit3QuestionsSoal,
     getCfit4QuestionsContoh,
-    getCfit4QuestionsSoal
+    getCfit4QuestionsSoal,
 } from "../controllers/questions.controller"
 
 const router = Router()
@@ -20,6 +26,8 @@ router.put('/peserta/status/:id', statusPeserta)
 //jawaban
 router.post('/answers/cfit/:id', answersCfit)
 router.post('/answers/disc/:id', answersDisc)
+router.post('/answers/kraepelin/:id', answersKraepelin)
+router.post('/answers/n8nKraepelin', n8nAnswersKraepelin)
 
 //pertanyaan
 //CFIT

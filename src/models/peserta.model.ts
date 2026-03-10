@@ -80,3 +80,20 @@ export const statusPesertaModel = async (sessionId: number, res:any) => {
         }
     })
 }
+
+//Hasil Tes
+export const hasilPesertaModel = async () => {
+    return await prisma.testSession.findMany({
+        where: {
+            statusTest: 2
+        },
+        select: {
+            peserta: {
+                select: {
+                    nama: true,
+                    createdAt: true
+                }
+            }
+        }
+    })
+}

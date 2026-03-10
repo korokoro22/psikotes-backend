@@ -1,19 +1,194 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  // output   = "../src/generated/prisma"
-  
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  
+}
+
+model Peserta {
+  id                 Int           @id @default(autoincrement())
+  nama               String
+  jenisKelamin       JenisKelamin
+  usia               Int
+  pendidikanTerakhir String
+  jurusan            String
+  tokenId            Int
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  unit               Unit          @default(UNKNOWN)
+  email              String        @default("null")
+  posisi             String        @default("null")
+  token              Token         @relation(fields: [tokenId], references: [id])
+  testSession        TestSession[]
+}
+
+model TestSession {
+  id          Int           @id @default(autoincrement())
+  pesertaId   Int
+  token       String
+  startedAt   DateTime      @default(now())
+  finishedAt  DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  statusTest  Int
+  jawabanCfit JawabanCfit[]
+  jawabanKraepelin JawabanKraepelin[]
+  kraepelinLog KraepelinLog[]
+  jawabanDisc JawabanDisc[]
+  attempts    TestAttempt[]
+  peserta     Peserta       @relation(fields: [pesertaId], references: [id])
+}
+
+model JawabanKraepelin {
+  id              Int @id @default(autoincrement())
+  sessionId       Int
+  columnIndex     Int
+  answers         Int[]
+  correctAnswers  Int
+  wrongAnswers    Int
+  totalAnswered   Int
+
+  session   TestSession @relation(fields: [sessionId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@index([sessionId])
+}
+
+model KraepelinLog {
+  id            Int @id @default(autoincrement())
+  sessionId     Int
+  timestamp     DateTime
+  event         String
+  fromCol       Int
+  toCol         Int
+  fromPair      Int
+  toPair        Int
+
+  session  TestSession  @relation(fields: [sessionId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model CfitQuestion {
+  id         Int          @id @default(autoincrement())
+  subtest    Int
+  order      Int
+  imagePath  String
+  isPractice Boolean      @default(false)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  options    CfitOption[]
+
+}
+
+model CfitOption {
+  id         Int          @id @default(autoincrement())
+  questionId Int
+  label      String
+  imagePath  String
+  question   CfitQuestion @relation(fields: [questionId], references: [id])
+
+  @@index([questionId])
+}
+
+model MsdtQuestion {
+  id        Int      @id @default(autoincrement())
+  sentences Json
+  createdAt DateTime @default(now())
+}
+
+model MbtiQuestion {
+  id        Int      @id @default(autoincrement())
+  sentences Json
+  createdAt DateTime @default(now())
+}
+
+model PapikostickQuestion {
+  id        Int      @id @default(autoincrement())
+  sentences Json
+  createdAt DateTime @default(now())
+}
+
+model Token {
+  id        Int       @id @default(autoincrement())
+  token     String    @unique
+  kuota     Int
+  usedCount Int       @default(0)
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  expiredAt DateTime?
+  tests     Tests[]
+  peserta   Peserta[]
+}
+
+model TestAttempt {
+  id         Int              @id @default(autoincrement())
+  sessionId  Int
+  testType   String
+  startedAt  DateTime         @default(now())
+  finishedAt DateTime?
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  answers    JawabanPeserta[]
+  session    TestSession      @relation(fields: [sessionId], references: [id])
+}
+
+model JawabanPeserta {
+  id         Int         @id @default(autoincrement())
+  attemptId  Int
+  questionId Int
+  answer     Json
+  createdAt  DateTime    @default(now())
+  attempt    TestAttempt @relation(fields: [attemptId], references: [id])
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model JawabanCfit {
+  id         Int         @id @default(autoincrement())
+  sessionId  Int
+  subtest    Int
+  questionId Int
+  createdAt  DateTime    @default(now())
+  answers    String[]
+  session    TestSession @relation(fields: [sessionId], references: [id])
+}
+
+model DiscQuestion {
+  id Int @id @default(autoincrement())
+  sentences String
+  questionIndex Int
+  optionIndex Int
+}
+
+model JawabanDisc {
+  id Int @id @default(autoincrement())
+  sessionId Int
+  questionIndex Int
+  p1 Int
+  p2 Int
+  p3 Int
+  p4 Int
+  k1 Int
+  k2 Int
+  k3 Int
+  k4 Int
+
+  session TestSession @relation(fields: [sessionId], references: [id])
+}
+
+model Testing {
+  id Int @id @default(autoincrement())
+  pesertaId Int
+  row_number Int
+  kesimpulan String
 }
 
 enum JenisKelamin {
@@ -22,195 +197,20 @@ enum JenisKelamin {
 }
 
 enum Tests {
-  CFIT 
-  DISC 
-  MSDT 
-  MBTI 
-  KRAEPELIN 
+  CFIT
+  DISC
+  MSDT
+  MBTI
+  KRAEPELIN
   PAPIKOSTICK
 }
 
 enum Unit {
-  SMP // Samamaju Prima
-  MPP // makassar putra prima
-  MMPP // makassar megaputra prima
-  IMP //Indo mega prima
-  PPH //putra prima hotel
-  ACS // Aptana Citra Solusindo
+  SMP
+  MPP
+  MMPP
+  IMP
+  PPH
+  ACS
   UNKNOWN
-}
-
-// Peserta
-
-model Peserta {
-  id Int @id @default(autoincrement())
-  nama String
-  email String @default("null")
-  jenisKelamin JenisKelamin
-  usia Int
-  pendidikanTerakhir String
-  jurusan String 
-  posisi String @default("null")
-  unit Unit @default(UNKNOWN)
-
-  testSession TestSession[]
-
-  tokenId Int
-  token Token @relation(fields: [tokenId], references: [id])  
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-// Questions
-
-model CfitQuestion {
-  id        Int      @id @default(autoincrement())
-  subtest   Int
-  order     Int
-  imagePath String        // gambar soal utama
-  isPractice Boolean @default(false)
-
-  options   CfitOption[]
-
-  createdAt DateTime @default(now())  
-  updatedAt DateTime @updatedAt
-
-  @@unique([subtest, order, isPractice])
-}
-
-model CfitOption {
-  id          Int      @id @default(autoincrement())
-  questionId  Int
-  label       String    // A, B, C, D, E, F
-  imagePath   String    // satu gambar saja
-
-  question    CfitQuestion @relation(fields: [questionId], references: [id])
-
-  @@index([questionId])
-}
-
-
-// Questions-MSDT
-model MsdtQuestion {
-  id        Int      @id @default(autoincrement())
-  sentences Json
-  createdAt DateTime @default(now())
-}
-
-// Questions-DISC
-model DiscQuestion {
-  id        Int      @id @default(autoincrement())
-  words     Json
-  createdAt DateTime @default(now())
-}
-
-// Questions-MBTI
-model MbtiQuestion {
-  id        Int       @id @default(autoincrement())
-  sentences Json
-  createdAt DateTime  @default(now())  
-}
-
-// Questions-PAPIKOSTICK
-model PapikostickQuestion {
-  id        Int       @id @default(autoincrement())
-  sentences Json
-  createdAt DateTime  @default(now())
-}
-
-// Token
-
-model Token {
-  id Int @id @default(autoincrement())
-  token String @unique
-  tests Tests[]
-  kuota Int
-  usedCount Int @default(0)
-  isActive Boolean @default(true)
-
-  peserta Peserta[]
-  
-  createdAt DateTime @default(now())
-  expiredAt DateTime? 
-}
-
-// jawaban
-
-model TestSession {
-  id         Int       @id @default(autoincrement())
-  pesertaId Int
-  token     String
-  statusTest Int 
-
-  startedAt DateTime  @default(now())
-  finishedAt DateTime?
-
-  peserta   Peserta   @relation(fields: [pesertaId], references: [id])
-  attempts  TestAttempt[]
-
-  jawabanCfit JawabanCfit[] 
-  jawabanDisc JawabanDisc[]
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-}
-
-model TestAttempt {
-  id         Int       @id @default(autoincrement())
-  sessionId Int
-  testType  String    // CFIT | MBTI | DISC | PAPI | MSDT
-
-  startedAt DateTime  @default(now())
-  finishedAt DateTime?
-
-  session   TestSession @relation(fields: [sessionId], references: [id])
-  answers   JawabanPeserta[]
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-}
-
-
-model JawabanPeserta {
-  id        Int    @id @default(autoincrement())
-  attemptId Int
-  questionId Int
-
-  answer    Json   // format tergantung test
-
-  attempt  TestAttempt @relation(fields: [attemptId], references: [id])
-
-  createdAt DateTime @default(now())
-}
-
-model Admin {
-  id Int @id @default(autoincrement())
-  username String @unique
-  password String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model JawabanCfit {
-  id         Int @id @default(autoincrement())
-  sessionId  Int
-  subtest    Int 
-  questionId Int
-  answers    String[]        
-
-  session    TestSession @relation(fields: [sessionId], references: [id])
-  createdAt  DateTime @default(now())
-}
-
-model JawabanDisc {
-  id          Int @id @default(autoincrement())
-  sessionId   Int
-  questionId  Int
-  most        String
-  least       String
-
-  session     TestSession @relation(fields: [sessionId], references: [id])
-  createdAt   DateTime @default(now())
 }
